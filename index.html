@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análise NPS & CSAT — V4 Company</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --red:#e50914; --red-dark:#b20710; --red-deep:#80050b; --red-night:#400306;
+    --light1:#ffffff; --light2:#e5e5e5; --light3:#cccccc; --light4:#b3b3b3;
+    --dark1:#333333; --dark2:#262626; --dark3:#1a1a1a; --dark4:#000000;
+    --green:#52cc5a; --amber:#ffc02a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Montserrat',Arial,sans-serif; background:var(--light2); color:var(--dark3); line-height:1.5;}
+  header,footer{background:var(--dark4); color:var(--light1); display:flex; align-items:center; justify-content:space-between; padding:18px 40px;}
+  .logo{display:flex; align-items:center; gap:10px; font-weight:800; font-size:22px; letter-spacing:.5px;}
+  .logo span{color:var(--red);}
+  .logo small{font-weight:400; font-size:12px; color:var(--light3); letter-spacing:2px;}
+  header .tag, footer .tag{font-size:12px; color:var(--light4);}
+  main{max-width:1100px; margin:0 auto; padding:30px 20px 60px;}
+  h1{font-size:28px; font-weight:800; color:var(--dark4); margin-bottom:4px;}
+  .subtitle{color:var(--dark1); font-size:14px; margin-bottom:30px;}
+  .section-title{font-size:18px; font-weight:700; color:var(--dark4); margin:36px 0 14px; padding-left:12px; border-left:5px solid var(--red);}
+  .kpi-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:10px;}
+  .kpi{background:var(--light1); border-radius:10px; padding:20px; border-top:4px solid var(--red); box-shadow:0 2px 6px rgba(0,0,0,.06);}
+  .kpi .label{font-size:12px; color:var(--dark1); text-transform:uppercase; letter-spacing:1px;}
+  .kpi .value{font-size:32px; font-weight:800; color:var(--dark4); margin-top:4px;}
+  .kpi .note{font-size:12px; color:var(--light4); margin-top:4px;}
+  .grid2{display:grid; grid-template-columns:1.1fr 1fr; gap:20px; align-items:start;}
+  .card{background:var(--light1); border-radius:10px; padding:20px; box-shadow:0 2px 6px rgba(0,0,0,.06);}
+  table{width:100%; border-collapse:collapse; font-size:14px;}
+  th{background:var(--dark4); color:var(--light1); text-align:left; padding:10px 12px; font-weight:600;}
+  td{padding:9px 12px; border-bottom:1px solid var(--light2);}
+  tr:nth-child(even) td{background:#fafafa;}
+  .badge{padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700; color:#fff;}
+  .badge.good{background:var(--green); color:var(--dark4);}
+  .badge.warn{background:var(--amber); color:var(--dark4);}
+  .badge.bad{background:var(--red);}
+  .comments{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  .comment-box h3{font-size:15px; margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--light2);}
+  .comment-box.pos h3{color:var(--green); border-color:var(--green);}
+  .comment-box.neg h3{color:var(--red); border-color:var(--red);}
+  .comment{background:var(--light2); border-radius:8px; padding:12px 14px; margin-bottom:10px; font-size:13.5px;}
+  .comment .meta{font-size:11px; color:var(--dark1); font-weight:700; margin-bottom:4px; text-transform:uppercase;}
+  .caveat{font-size:12px; color:var(--dark1); background:#fff7e6; border-left:4px solid var(--amber); padding:10px 14px; border-radius:6px; margin-bottom:16px;}
+  .highlight{background:var(--red-night); color:var(--light1); border-radius:10px; padding:16px 20px; margin-top:10px; font-size:13.5px;}
+  @media(max-width:760px){.grid2,.comments{grid-template-columns:1fr;} header,footer{padding:16px 18px; flex-direction:column; gap:8px; text-align:center;}}
+</style>
+</head>
+<body>
+
+<header>
+  <!-- Substituir pela logo oficial: <img src="logo-v4.png" alt="V4 Company" height="32"> -->
+  <div class="logo">V4<span>•</span>COMPANY<br></div>
+  <div class="tag">Relatório de Satisfação · Junho/2026</div>
+</header>
+
+<main>
+  <h1>Análise de NPS &amp; CSAT</h1>
+  <p class="subtitle">Resultados consolidados das pesquisas de satisfação — Squads Invictus e Billions</p>
+
+  <div class="section-title">Visão Geral</div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="label">NPS Geral</div><div class="value">36,7</div><div class="note">30 respostas</div></div>
+    <div class="kpi"><div class="label">CSAT Geral</div><div class="value">3,84</div><div class="note">escala 1-5</div></div>
+    <div class="kpi"><div class="label">Promotores</div><div class="value">46,7%</div><div class="note">14 de 30</div></div>
+    <div class="kpi"><div class="label">Detratores</div><div class="value">10,0%</div><div class="note">3 de 30</div></div>
+  </div>
+
+  <div class="grid2" style="margin-top:20px;">
+    <div class="card" style="height:300px;"><canvas id="npsDonut"></canvas></div>
+    <div class="card" style="height:300px;"><canvas id="csatAreas"></canvas></div>
+  </div>
+
+  <div class="section-title">NPS por Squad e Coordenação</div>
+  <div class="grid2">
+    <div class="card">
+      <canvas id="npsSquad" height="180"></canvas>
+    </div>
+    <div class="card">
+      <table>
+        <tr><th>Coordenação</th><th>n</th><th>NPS</th></tr>
+        <tr><td>Ueliton</td><td>3</td><td><span class="badge good">100,0</span></td></tr>
+        <tr><td>Ariel</td><td>4</td><td><span class="badge good">75,0</span></td></tr>
+        <tr><td>Guilherme</td><td>3</td><td><span class="badge good">66,7</span></td></tr>
+        <tr><td>Thaina</td><td>6</td><td><span class="badge good">66,7</span></td></tr>
+        <tr><td>Nayara</td><td>3</td><td><span class="badge warn">0,0</span></td></tr>
+        <tr><td>Jefferson</td><td>11</td><td><span class="badge bad">-9,1</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">CSAT por Squad e Coordenação</div>
+  <div class="grid2">
+    <div class="card">
+      <table>
+        <tr><th>Squad</th><th>n</th><th>CSAT (Geral)</th></tr>
+        <tr><td>Billions</td><td>7</td><td><span class="badge good">3,86</span></td></tr>
+        <tr><td>Invictus</td><td>18</td><td><span class="badge good">3,83</span></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <table>
+        <tr><th>Coordenação</th><th>n</th><th>CSAT (Geral)</th></tr>
+        <tr><td>Ueliton</td><td>3</td><td><span class="badge good">4,33</span></td></tr>
+        <tr><td>Thaina</td><td>6</td><td><span class="badge good">4,00</span></td></tr>
+        <tr><td>Ariel</td><td>4</td><td><span class="badge good">4,00</span></td></tr>
+        <tr><td>Nayara</td><td>3</td><td><span class="badge warn">3,67</span></td></tr>
+        <tr><td>Jefferson</td><td>9</td><td><span class="badge bad">3,56</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">CSAT por Dimensão — detalhado por Coordenação</div>
+  <div class="card" style="overflow-x:auto;">
+    <table>
+      <tr><th>Coordenação</th><th>Geral</th><th>Atendimento</th><th>Campanhas</th><th>Copys</th><th>Designs</th><th>Prazos</th><th>Resultados</th></tr>
+      <tr><td>Ueliton</td><td>4,33</td><td>5,00</td><td>5,00</td><td>4,67</td><td>4,67</td><td>4,67</td><td>5,00</td></tr>
+      <tr><td>Thaina</td><td>4,00</td><td>4,67</td><td>4,50</td><td>4,00</td><td>4,00</td><td>5,00</td><td>4,33</td></tr>
+      <tr><td>Ariel</td><td>4,00</td><td>4,50</td><td>4,25</td><td>4,75</td><td>4,00</td><td>4,50</td><td>4,50</td></tr>
+      <tr><td>Nayara</td><td>3,67</td><td>4,67</td><td>3,33</td><td>4,00</td><td>4,00</td><td>4,00</td><td>4,33</td></tr>
+      <tr><td>Jefferson</td><td>3,56</td><td>4,56</td><td>3,56</td><td>3,89</td><td>3,44</td><td>4,44</td><td>3,78</td></tr>
+    </table>
+    <div class="caveat" style="margin-top:14px;">Guilherme não possui respostas de CSAT (apenas NPS).</div>
+  </div>
+  <div class="caveat">A planilha de NPS não possui campo de comentários. Os comentários abaixo vêm da pesquisa de CSAT, classificados pela nota "Geral" (4-5 = positivo / 0-3 = negativo) como proxy de promotor/detrator.</div>
+  <div class="comments">
+    <div class="comment-box pos">
+      <h3>😊 Positivos (CSAT 4-5)</h3>
+      <div class="comment"><div class="meta">Invictus · Ueliton</div>"Vocês são feras!!!"</div>
+      <div class="comment"><div class="meta">Invictus · Thaina</div>"Vocês são maravilhosos!"</div>
+      <div class="comment"><div class="meta">Billions · Ariel</div>"Tudo está ótimo! Trabalhando pra potencializar os resultados ainda mais."</div>
+      <div class="comment"><div class="meta">Invictus · Thaina</div>"No momento vocês estão atendendo todas nossas expectativas"</div>
+      <div class="comment"><div class="meta">Billions · Nayara</div>"Atendimento total às metas desenhadas"</div>
+    </div>
+    <div class="comment-box neg">
+      <h3>⚠️ Negativos (CSAT ≤3) — todos Invictus/Jefferson</h3>
+      <div class="comment"><div class="meta">Invictus · Jefferson</div>"Ser mais objetivo, enxutar as informações, deixar mais claro o que elas significam e melhorar organização com cronogramas e metas de entrega."</div>
+      <div class="comment"><div class="meta">Invictus · Jefferson</div>"Com a minha chegada estamos em ajustes de entregas, estratégias e prazos. A comunicação entre as equipes precisa ser mais ágil."</div>
+      <div class="comment"><div class="meta">Invictus · Jefferson</div>"Esperamos da V4 ideias para inovar, que tragam resultados melhores, aumentando faturamento e lucratividade."</div>
+    </div>
+  </div>
+
+  <div class="highlight">📌 <strong>Ponto de atenção:</strong> todos os sinais negativos (NPS mais baixo, CSAT mais baixo e os 3 comentários críticos) se concentram na coordenação <strong>Jefferson</strong>.</div>
+</main>
+
+<footer>
+  <!-- Substituir pela logo oficial: <img src="logo-v4.png" alt="V4 Company" height="24"> -->
+  <div class="logo" style="font-size:16px;">V4<span>•</span>COMPANY</div>
+  <div class="tag">© 2026 V4 Company — Relatório interno de satisfação</div>
+</footer>
+
+<script>
+const redScale = ['#e50914','#b20710','#80050b','#400306','#ffc02a','#52cc5a'];
+
+new Chart(document.getElementById('npsDonut'), {
+  type:'doughnut',
+  data:{labels:['Promotores','Neutros','Detratores'],
+    datasets:[{data:[14,13,3], backgroundColor:['#52cc5a','#ffc02a','#e50914'], borderWidth:0}]},
+  options:{maintainAspectRatio:false, plugins:{title:{display:true,text:'Distribuição NPS (n=30)',font:{size:14,weight:'bold'}},legend:{position:'bottom'}}}
+});
+
+new Chart(document.getElementById('csatAreas'), {
+  type:'bar',
+  data:{labels:['Geral','Atendimento','Campanhas','Copys','Designs','Prazos','Resultados'],
+    datasets:[{label:'CSAT médio', data:[3.84,4.64,4.04,4.16,3.88,4.56,4.24], backgroundColor:'#e50914', borderRadius:5}]},
+  options:{maintainAspectRatio:false, plugins:{title:{display:true,text:'CSAT Geral por Área',font:{size:14,weight:'bold'}},legend:{display:false}}, scales:{y:{beginAtZero:true,max:5}}}
+});
+
+new Chart(document.getElementById('npsSquad'), {
+  type:'bar',
+  data:{labels:['Billions','Invictus'],
+    datasets:[{label:'NPS', data:[50.0,30.0], backgroundColor:['#e50914','#80050b'], borderRadius:5}]},
+  options:{plugins:{title:{display:true,text:'NPS por Squad',font:{size:14,weight:'bold'}},legend:{display:false}}, scales:{y:{min:-20,max:100}}}
+});
+</script>
+</body>
+</html>
